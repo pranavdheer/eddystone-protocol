@@ -26,7 +26,7 @@ class Eddystone(Enum):
 
     uid = 0x00
     url = 0x10
-    tlm = 0x20
+    eid = 0x30
 
 extensions = [
         ".com/", ".org/", ".edu/", ".net/", ".info/", ".biz/", ".gov/",
@@ -82,6 +82,27 @@ def encodeUid(uid):
     ret.append(0x00)
     return ret
 
+def encodeEid(eid):
+   if not eidIsValid(eid):
+      raise ValueError("Invalid eid")
+   ret=[]
+   for i in range (0,len(eid),2):
+      ret.append(int(eid[i:i+2],16))
+
+   return ret       
+
+
+
+def eidIsValid(eid):
+   if len(eid) == 16:
+     try:
+       int (eid,16)
+       return True
+     except ValueError:
+       return False
+   else:
+     return False
+  
 def uidIsValid(uid):
     """UID Validation."""
     if len(uid) == 32:
@@ -99,6 +120,10 @@ def encodeMessage(data, beacon_type):
     """Message encoder."""
     if beacon_type == Eddystone.url:
         payload = encodeurl(data)
+
+    elif beacon_type == Eddystone.eid:
+         payload = encodeEid(data)
+
     elif beacon_type == Eddystone.uid:
         payload = encodeUid(data)
     encodedmessageLength = len(payload)
@@ -178,6 +203,7 @@ parser = argparse.ArgumentParser(description='eddystone script')
 parser.add_argument('--uid', dest='uid', type=str, nargs='?',default=defaultUid,help='eddystone uid')
 parser.add_argument('--url', dest='url', type=str, nargs='?', help='eddystone URL')
 parser.add_argument('-t', '--terminate', action='store_true',help='Stop advertising URL.')
+parser.add_argument('--eid',dest='eid',type=str,help='advertise EID')
 
 args=parser.parse_args()
 
@@ -187,5 +213,7 @@ if __name__ == "__main__":
         stopAdvertising()
     elif args.url:
         advertise(args.url,Eddystone.url)
+    elif args.eid:
+        advertise(args.eid,Eddystone.eid)
     else:
         advertise(args.uid,Eddystone.uid)
