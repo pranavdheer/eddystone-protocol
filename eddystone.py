@@ -2,12 +2,16 @@
 
 import subprocess
 import argparse
+from enum import Enum
+
 
 # The default url
 defaultUrl = "https://goo.gl/SkcDTN"
 
 # The default uid
 defaultUid = "01234567890123456789012345678901"
+
+DEVNULL=subprocess.DEVNULL
 
 schemes = [
         "http://www.",
@@ -171,12 +175,11 @@ def advertise(ad, beacon_type):
 parser = argparse.ArgumentParser(description='eddystone script')
 
 
-parser.add_argument('--uid', dest='uid', type=str, nargs='?',
-             required=True, default=defaultUid,help='eddystone uid')
-parser.add_argument('--url', dest='url', type=str, nargs='?',
-                    required=True, help='eddystone URL')
-parser.add_argument('-t', '--terminate', action='store_true',
-                    help='Stop advertising URL.')
+parser.add_argument('--uid', dest='uid', type=str, nargs='?',default=defaultUid,help='eddystone uid')
+parser.add_argument('--url', dest='url', type=str, nargs='?', help='eddystone URL')
+parser.add_argument('-t', '--terminate', action='store_true',help='Stop advertising URL.')
+
+args=parser.parse_args()
 
 if __name__ == "__main__":
     subprocess.call(["sudo", "-v"])
